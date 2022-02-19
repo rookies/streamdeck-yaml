@@ -12,7 +12,11 @@ class HomeAssistantLight(Key):
     and can control it.
     """
 
-    _icon = "lightbulb-question"
+    _icon_by_state = {
+        "on": "lightbulb-on",
+        "off": "lightbulb-off",
+        "unknown": "lightbulb-question",
+    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -20,6 +24,9 @@ class HomeAssistantLight(Key):
         self._handler_key = self._backend.register_state_change_handler(
             self._values["entity_id"], self._statechange
         )
+
+        state = self._backend.get_entity_state(self._values["entity_id"])
+        self._set_icon(state)
 
     def __del__(self):
         self._backend.unregister_state_change_handler(self._handler_key)
@@ -34,15 +41,15 @@ class HomeAssistantLight(Key):
             self._backend.call_service(
                 "light", "turn_on", target={"entity_id": self._values["entity_id"]}
             )
-            self._icon = "lightbulb-on"
+            self._set_icon("on")
         elif state == "on":
             self._backend.call_service(
                 "light", "turn_off", target={"entity_id": self._values["entity_id"]}
             )
-            self._icon = "lightbulb-off"
+            self._set_icon("off")
         else:
             print(f"Entity {self._values['entity_id']} is in unknown state")
-            self._icon = "lightbulb-question"
+            self._set_icon("unknown")
 
         return KeyPressResult.REDRAW
 
@@ -50,14 +57,18 @@ class HomeAssistantLight(Key):
         """
         Callback for entity state changes.
         """
-        if state == "off":
-            self._icon = "lightbulb-on"
-        elif state == "on":
-            self._icon = "lightbulb-off"
-        else:
-            self._icon = "lightbulb-question"
+        self._set_icon(state)
 
         self._trigger_redraw()
+
+    def _set_icon(self, state):
+        """
+        Sets the icon according to the given state.
+        """
+        if state in self._icon_by_state:
+            self._icon = self._icon_by_state[state]
+        else:
+            self._icon = self._icon_by_state["unknown"]
 
 
 class HomeAssistantScript(Key):
