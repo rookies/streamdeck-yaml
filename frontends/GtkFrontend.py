@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import gi
-from Frontend import Frontend
+from frontends import Frontend
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk

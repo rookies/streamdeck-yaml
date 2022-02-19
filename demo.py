@@ -3,8 +3,8 @@ import sys
 import os.path
 import threading
 import yaml
-from GtkFrontend import GtkFrontend
-from HomeAssistant import HomeAssistant
+import frontends
+import backends
 
 
 class Main:
@@ -18,13 +18,26 @@ class Main:
 
         self._submenu = []
         self._icon_path = os.path.join(os.path.dirname(__file__), "icons")
-        # TODO: Don't hardcode frontend kind
-        self._frontend = GtkFrontend(self.layout["rows"], self.layout["columns"], self._callback)
 
+        # Load frontend:
+        print(f"Available frontends: {', '.join(frontends.AVAILABLE)}")
+        frontend_kind = self.layout["frontend"]["kind"]
+        if frontend_kind not in frontends.AVAILABLE:
+            print(f"Unknown frontend {frontend_kind}")
+            sys.exit(1)
+        self._frontend = getattr(frontends, frontend_kind)(self.layout["frontend"]["rows"], self.layout["frontend"]["columns"], self._callback)
+        print(f"Loaded frontend {frontend_kind}")
+
+        # Load backends:
+        print(f"Available backends: {', '.join(backends.AVAILABLE)}")
         self._backends = {}
         for key, backend in self.layout["backends"].items():
-            # TODO: Don't hardcode backend kind
-            self._backends[key] = HomeAssistant(**backend["values"])
+            backend_kind = backend["kind"]
+            if backend_kind not in backends.AVAILABLE:
+                print(f"Unknown backend {backend_kind}")
+                sys.exit(1)
+            self._backends[key] = getattr(backends, backend_kind)(**backend["values"])
+            print(f"Loaded backend {backend_kind} as {key}")
 
     def run(self):
         # Start a thread for each backend:
@@ -39,9 +52,9 @@ class Main:
         submenu_layout = self.get_submenu_layout()
 
         self._frontend.clear()
-        for row in range(self.layout["rows"]):
-            for col in range(self.layout["columns"]):
-                key_index = row * self.layout["columns"] + col
+        for row in range(self.layout["frontend"]["rows"]):
+            for col in range(self.layout["frontend"]["columns"]):
+                key_index = row * self.layout["frontend"]["columns"] + col
 
                 if key_index >= len(submenu_layout):
                     break

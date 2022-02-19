@@ -4,7 +4,7 @@ import json
 import websocket
 
 
-class HomeAssistant:
+class HomeAssistantBackend:
     def __init__(self, url, token, insecure=False):
         self._ws = websocket.WebSocketApp(url,
             on_open=self._on_open, on_message=self._on_message, on_error=self._on_error, on_close=self._on_close)

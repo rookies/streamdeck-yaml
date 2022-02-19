@@ -1,7 +1,5 @@
 ---
 
-rows: 2
-columns: 3
 keys:
   - kind: SubMenu
     icon: lightbulb-multiple
@@ -23,9 +21,13 @@ keys:
   - kind: PushButton
     icon: theater
     title: Cinema
+frontend:
+  kind: GtkFrontend
+  rows: 2
+  columns: 3
 backends:
   ha-tony:
-    kind: HomeAssistant
+    kind: HomeAssistantBackend
     values:
       url: ...
       token: ...
