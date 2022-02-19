@@ -3,12 +3,15 @@
 Main application entrypoint.
 """
 import sys
+import logging
 import threading
 import yaml
 import frontends
 import backends
 import keys
 from image import ImageRenderer
+
+logger = logging.getLogger("streamdeck.main")
 
 
 class Main:
@@ -17,8 +20,11 @@ class Main:
     """
 
     def __init__(self, argv):
+        logging.basicConfig(level=logging.INFO)
+        # ^- TODO: Make this configurable!
+
         if len(argv) != 2:
-            print(f"Usage: {argv[0]} layout.yml")
+            print(f"Usage: {argv[0]} layout.yml", file=sys.stderr)
             sys.exit(1)
 
         with open(argv[1], encoding="utf8") as file_handle:
@@ -28,31 +34,31 @@ class Main:
         self._keys = []
 
         # Load frontend:
-        print(f"Available frontends: {', '.join(frontends.AVAILABLE)}")
+        logger.info("Available frontends: %s", ", ".join(frontends.AVAILABLE))
         frontend_kind = self.layout["frontend"]["kind"]
         if frontend_kind not in frontends.AVAILABLE:
-            print(f"Unknown frontend {frontend_kind}")
+            logger.error("Unknown frontend: %s", frontend_kind)
             sys.exit(1)
         self._frontend = getattr(frontends, frontend_kind)(
             self.layout["frontend"]["rows"],
             self.layout["frontend"]["columns"],
             self._callback,
         )
-        print(f"Loaded frontend {frontend_kind}")
+        logger.info("Loaded frontend %s", frontend_kind)
 
         # Load backends:
-        print(f"Available backends: {', '.join(backends.AVAILABLE)}")
+        logger.info("Available backends: %s", ", ".join(backends.AVAILABLE))
         self._backends = {}
         for key, backend in self.layout["backends"].items():
             backend_kind = backend["kind"]
             if backend_kind not in backends.AVAILABLE:
-                print(f"Unknown backend {backend_kind}")
+                logger.error("Unknown backend: %s", backend_kind)
                 sys.exit(1)
             self._backends[key] = getattr(backends, backend_kind)(**backend["values"])
-            print(f"Loaded backend {backend_kind} as {key}")
+            logger.info("Loaded backend %s as %s", backend_kind, key)
 
         # Print available keys:
-        print(f"Available keys: {', '.join(keys.AVAILABLE)}")
+        logger.info("Available keys: %s", ", ".join(keys.AVAILABLE))
 
         # Create image renderer:
         self._renderer = ImageRenderer(self._frontend.image_size, self.layout["style"])
@@ -91,13 +97,13 @@ class Main:
                 # Create key object:
                 key_kind = key_config["kind"]
                 if key_kind not in keys.AVAILABLE:
-                    print(f"Unknown key {key_kind}")
+                    logger.error("Unknown key: %s", key_kind)
                     sys.exit(1)
                 key = getattr(keys, key_kind)(
                     key_config.get("values", {}),
                     self._backends.get(key_config.get("backend")),
                 )
-                print(f"Loaded key {key_kind} at position ({row},{col})")
+                logger.info("Loaded key %s at position (%d,%d)", key_kind, row, col)
                 self._keys.append(key)
 
     def _draw(self):
@@ -126,7 +132,12 @@ class Main:
 
         key = self._keys[key_index]
         result = key.pressed()
-        print(key_index, key_config, result)
+        logger.debug(
+            "Keypress handler for key #%d (%s) returned %s",
+            key_index,
+            key_config,
+            result,
+        )
         if result == keys.KeyPressResult.MENU_ENTER:
             self._submenu.append(key_index)
             self._create_keys()

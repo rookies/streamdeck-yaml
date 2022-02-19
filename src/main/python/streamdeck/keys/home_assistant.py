@@ -2,7 +2,10 @@
 """
 Keys for integration with HomeAssistant.
 """
+import logging
 from keys.generic import Key, KeyPressResult
+
+logger = logging.getLogger("streamdeck.keys.home_assistant")
 
 
 class HomeAssistantLight(Key):
@@ -48,7 +51,9 @@ class HomeAssistantLight(Key):
             )
             self._set_icon("off")
         else:
-            print(f"Entity {self._values['entity_id']} is in unknown state")
+            logger.warning(
+                "Entity %s is in unknown state: %s", self._values["entity_id"], state
+            )
             self._set_icon("unknown")
 
         return KeyPressResult.REDRAW

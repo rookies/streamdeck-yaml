@@ -4,8 +4,11 @@ HomeAssistant backend
 """
 import ssl
 import json
+import logging
 from typing import Optional
 import websocket
+
+logger = logging.getLogger("streamdeck.backends.home_assistant")
 
 
 class HomeAssistantBackend:
@@ -97,8 +100,7 @@ class HomeAssistantBackend:
         """
         Handler for received WebSocket messages.
         """
-        print("+++ MESSAGE +++")
-        print(message)
+        logger.debug("Received message: %s", message)
 
         data = json.loads(message)
         msg_type = data.get("type", "")
@@ -110,18 +112,22 @@ class HomeAssistantBackend:
             # Authentication succeeded, subscribe to events and get initial states:
             self._send_with_id({"type": "subscribe_events"})
             self._get_states_id = self._send_with_id({"type": "get_states"})
-        elif msg_type == "result" and data["id"] == self._get_states_id:
-            # Initial states received, store them:
+        elif msg_type == "result":
             # TODO: What if data["success"] is False?
-            for entity in data["result"]:
-                self._entity_states[entity["entity_id"]] = entity["state"]
-                self._call_handlers(entity["entity_id"])
-        elif msg_type == "event" and data["event"]["event_type"] == "state_changed":
-            # State change received, update entity states:
-            self._entity_states[data["event"]["data"]["entity_id"]] = data["event"][
-                "data"
-            ]["new_state"]["state"]
-            self._call_handlers(data["event"]["data"]["entity_id"])
+            if data["id"] == self._get_states_id:
+                # Initial states received, store them:
+                for entity in data["result"]:
+                    self._entity_states[entity["entity_id"]] = entity["state"]
+                    self._call_handlers(entity["entity_id"])
+        elif msg_type == "event":
+            if data["event"]["event_type"] == "state_changed":
+                # State change received, update entity states:
+                self._entity_states[data["event"]["data"]["entity_id"]] = data["event"][
+                    "data"
+                ]["new_state"]["state"]
+                self._call_handlers(data["event"]["data"]["entity_id"])
+        else:
+            logger.warning("Unknown message: %s", message)
 
     def _call_handlers(self, entity_id):
         """
@@ -136,23 +142,21 @@ class HomeAssistantBackend:
         """
         Handler for WebSocket errors.
         """
-        print("+++ ERROR +++")
-        print(error)
+        logger.error("WebSocket error: %s", error)
 
     @staticmethod
     def _on_close(_, status_code, msg):
         """
         Handler that is called when the WebSocket connection is closed.
         """
-        print("+++ CLOSE +++")
-        print(status_code, msg)
+        logger.info("WebSocket connection closed: %d %s", status_code, msg)
 
     @staticmethod
     def _on_open(_):
         """
         Handler that is called when the WebSocket connection is opened.
         """
-        print("+++ OPEN +++")
+        logger.info("Websocket connection opened")
 
     def _send(self, data):
         """
