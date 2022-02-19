@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 import gi
+from Frontend import Frontend
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 
-class GtkFrontend:
+class GtkFrontend(Frontend):
     def __init__(self, rows, columns, callback):
         self._layout = (rows, columns)
         self._callback = callback
