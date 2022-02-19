@@ -3,6 +3,7 @@
 Abstract base class for all frontends.
 """
 from abc import ABC, abstractmethod
+from PIL import Image
 
 
 class Frontend(ABC):
@@ -33,8 +34,8 @@ class Frontend(ABC):
         ...
 
     @abstractmethod
-    def set_key(self, key_index: int, title: str, image_path: str):
+    def set_key(self, key_index: int, image: Image):
         """
-        Sets the content of the key with the given index.
+        Sets the image for the key with the given index.
         """
         ...

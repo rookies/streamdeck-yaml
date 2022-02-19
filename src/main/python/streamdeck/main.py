@@ -8,6 +8,7 @@ import yaml
 import frontends
 import backends
 import keys
+from image import ImageRenderer
 
 
 class Main:
@@ -52,6 +53,9 @@ class Main:
 
         # Print available keys:
         print(f"Available keys: {', '.join(keys.AVAILABLE)}")
+
+        # Create image renderer:
+        self._renderer = ImageRenderer(self._frontend.image_size, self.layout["style"])
 
     def run(self):
         """
@@ -103,7 +107,7 @@ class Main:
         self._frontend.clear()
         for key_index, key in enumerate(self._keys):
             if key is not None:
-                self._frontend.set_key(key_index, key.title, key.icon_path)
+                self._frontend.set_key(key_index, self._renderer.render(key))
         self._frontend.draw()
 
     def _callback(self, key_index):

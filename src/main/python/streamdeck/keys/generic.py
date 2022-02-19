@@ -3,10 +3,7 @@
 Contains an abstract base class for key classes as well as some generic key classes.
 """
 import enum
-import os.path
 from abc import ABC, abstractmethod
-
-ICON_PATH = os.path.join(os.path.dirname(__file__), "../../../resources/icons")
 
 
 class KeyPressResult(enum.Enum):
@@ -50,11 +47,11 @@ class Key(ABC):
         return self._title
 
     @property
-    def icon_path(self):
+    def icon(self):
         """
-        Returns the path to the icon for the key.
+        Returns the name of the icon for the key.
         """
-        return os.path.join(ICON_PATH, f"{self._icon}.png")
+        return self._icon
 
     @abstractmethod
     def pressed(self) -> KeyPressResult:

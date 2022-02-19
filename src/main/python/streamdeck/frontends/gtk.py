@@ -3,16 +3,20 @@
 Gtk frontend, useful for development purposes
 """
 import gi
+from PIL import Image
 from frontends import Frontend
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk  # pylint: disable=wrong-import-position
+gi.require_version("GdkPixbuf", "2.0")
+from gi.repository import Gtk, GdkPixbuf, GLib  # pylint: disable=wrong-import-position
 
 
 class GtkFrontend(Frontend):
     """
     Gtk frontend, useful for development purposes
     """
+
+    image_size = (80, 80)
 
     def __init__(self, rows, columns, callback):
         self._layout = (rows, columns)
@@ -52,13 +56,21 @@ class GtkFrontend(Frontend):
         # pylint: disable=missing-function-docstring
         Gtk.main()
 
-    def set_key(self, key_index, title, image_path):
+    def set_key(self, key_index: int, image: Image):
         # pylint: disable=missing-function-docstring
-        image = Gtk.Image.new_from_file(image_path)
-        self._buttons[key_index].set_label(title)
+        # See https://gist.github.com/mozbugbox/10cd35b2872628246140
+        pixbuf = GdkPixbuf.Pixbuf.new_from_bytes(
+            GLib.Bytes.new(image.tobytes()),
+            GdkPixbuf.Colorspace.RGB,
+            False,
+            8,
+            image.size[0],
+            image.size[1],
+            image.size[0] * 3,
+        ).copy()
+        gtk_image = Gtk.Image.new_from_pixbuf(pixbuf)
+        self._buttons[key_index].set_image(gtk_image)
         self._buttons[key_index].set_always_show_image(True)
-        self._buttons[key_index].set_image_position(Gtk.PositionType.TOP)
-        self._buttons[key_index].set_image(image)
 
     def _keypress(self, _, key_index):
         """

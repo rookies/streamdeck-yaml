@@ -14,12 +14,16 @@ keys:
         - kind: HomeAssistantLight
           backend: ha-tony
           values:
-            title: Decoration
+            title: Deco
             entity_id: light.bedroom_decoration_lamps
         - null
         - null
         - null
         - kind: BackButton
+  - null
+  - null
+  - null
+  - null
   - kind: HomeAssistantScript
     backend: ha-tony
     values:
@@ -30,6 +34,10 @@ frontend:
   kind: GtkFrontend
   rows: 2
   columns: 3
+style:
+  font: /usr/share/fonts/TTF/OpenSans-Bold.ttf
+  max_fontsize: 15
+  padding: 2
 backends:
   ha-tony:
     kind: HomeAssistantBackend
