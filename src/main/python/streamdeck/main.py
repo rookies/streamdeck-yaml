@@ -89,7 +89,10 @@ class Main:
                 if key_kind not in keys.AVAILABLE:
                     print(f"Unknown key {key_kind}")
                     sys.exit(1)
-                key = getattr(keys, key_kind)(key_config.get("values", {}), self._backends.get(key_config.get("backend")))
+                key = getattr(keys, key_kind)(
+                    key_config.get("values", {}),
+                    self._backends.get(key_config.get("backend")),
+                )
                 print(f"Loaded key {key_kind} at position ({row},{col})")
                 self._keys.append(key)
 
