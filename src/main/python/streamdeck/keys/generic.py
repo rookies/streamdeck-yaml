@@ -32,7 +32,7 @@ class Key(ABC):
         if "icon" in self._values:
             self._icon = self._values["icon"]
         elif not hasattr(self, "_icon"):
-            self._icon = "unknown"
+            self._icon = "help"
 
         if "title" in self._values:
             self._title = self._values["title"]

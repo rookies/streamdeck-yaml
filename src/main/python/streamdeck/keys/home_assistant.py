@@ -8,17 +8,23 @@ from keys.generic import Key, KeyPressResult
 logger = logging.getLogger("streamdeck.keys.home_assistant")
 
 
-class HomeAssistantLight(Key):
-    # pylint: disable=too-few-public-methods
+class HomeAssistantToggle(Key):
     """
-    A key that represents the state of a HomeAssistant light entity
-    and can control it.
+    A key that represents the state of a HomeAssistant entity that can be toggled.
+    Currently, lights and switches are supported.
     """
 
-    _icon_by_state = {
-        "on": "lightbulb-on",
-        "off": "lightbulb-off",
-        "unknown": "lightbulb-question",
+    _icon_by_domain_and_state = {
+        "light": {
+            "on": "lightbulb-on",
+            "off": "lightbulb-off",
+            "unknown": "lightbulb-question",
+        },
+        "switch": {
+            "on": "toggle-switch",
+            "off": "toggle-switch-off",
+            "unknown": "toggle-switch",
+        },
     }
 
     def __init__(self, *args, **kwargs):
@@ -27,6 +33,9 @@ class HomeAssistantLight(Key):
         self._handler_key = self._backend.register_state_change_handler(
             self._values["entity_id"], self._statechange
         )
+
+        self._domain = self._values["entity_id"].split(".")[0]
+        self._icon_by_state = self._icon_by_domain_and_state[self._domain]
 
         state = self._backend.get_entity_state(self._values["entity_id"])
         self._set_icon(state)
@@ -42,12 +51,14 @@ class HomeAssistantLight(Key):
 
         if state == "off":
             self._backend.call_service(
-                "light", "turn_on", target={"entity_id": self._values["entity_id"]}
+                self._domain, "turn_on", target={"entity_id": self._values["entity_id"]}
             )
             self._set_icon("on")
         elif state == "on":
             self._backend.call_service(
-                "light", "turn_off", target={"entity_id": self._values["entity_id"]}
+                self._domain,
+                "turn_off",
+                target={"entity_id": self._values["entity_id"]},
             )
             self._set_icon("off")
         else:
