@@ -28,7 +28,7 @@ class Main:
         self._frontend.clear()
         for row in range(self.layout["rows"]):
             for col in range(self.layout["columns"]):
-                key_index = self._frontend.key_index(row, col)
+                key_index = row * self.layout["columns"] + col
 
                 if key_index >= len(submenu_layout):
                     break

@@ -23,7 +23,7 @@ class GtkFrontend:
             for col in range(columns):
                 button = Gtk.Button()
 
-                key_index = self.key_index(row, col)
+                key_index = row * self._layout[1] + col
                 button.connect("clicked", self._keypress, key_index)
 
                 self._buttons.append(button)
@@ -46,9 +46,6 @@ class GtkFrontend:
         self._buttons[key_index].set_always_show_image(True)
         self._buttons[key_index].set_image_position(Gtk.PositionType.TOP)
         self._buttons[key_index].set_image(image)
-
-    def key_index(self, row, col):
-        return row * self._layout[1] + col
 
     def _keypress(self, button, key_index):
         self._callback(key_index)
