@@ -3,11 +3,11 @@
 Main application entrypoint.
 """
 import sys
-import os.path
 import threading
 import yaml
 import frontends
 import backends
+import keys
 
 
 class Main:
@@ -24,9 +24,7 @@ class Main:
             self.layout = yaml.safe_load(file_handle)
 
         self._submenu = []
-        self._icon_path = os.path.join(
-            os.path.dirname(__file__), "../../resources/icons"
-        )
+        self._keys = []
 
         # Load frontend:
         print(f"Available frontends: {', '.join(frontends.AVAILABLE)}")
@@ -52,6 +50,9 @@ class Main:
             self._backends[key] = getattr(backends, backend_kind)(**backend["values"])
             print(f"Loaded backend {backend_kind} as {key}")
 
+        # Print available keys:
+        print(f"Available keys: {', '.join(keys.AVAILABLE)}")
+
     def run(self):
         """
         Starts the application main loops.
@@ -70,6 +71,7 @@ class Main:
         """
         submenu_layout = self.get_submenu_layout()
 
+        self._keys = []
         self._frontend.clear()
         for row in range(self.layout["frontend"]["rows"]):
             for col in range(self.layout["frontend"]["columns"]):
@@ -79,13 +81,19 @@ class Main:
                     break
                 key_config = submenu_layout[key_index]
                 if key_config is None:
+                    self._keys.append(None)
                     continue
 
-                self._frontend.set_key(
-                    key_index,
-                    key_config["title"],
-                    os.path.join(self._icon_path, f"{key_config['icon']}.png"),
-                )
+                # Create key object:
+                key_kind = key_config["kind"]
+                if key_kind not in keys.AVAILABLE:
+                    print(f"Unknown key {key_kind}")
+                    sys.exit(1)
+                key = getattr(keys, key_kind)(key_config)
+                print(f"Loaded key {key_kind} at position ({row},{col})")
+                self._keys.append(key)
+
+                self._frontend.set_key(key_index, key.title, key.icon_path)
         self._frontend.draw()
 
     def _callback(self, key_index):
@@ -102,15 +110,16 @@ class Main:
         if key_config is None:
             return
 
-        if key_config["kind"] == "SubMenu":
+        key = self._keys[key_index]
+        result = key.pressed()
+        if result == keys.KeyPressResult.MENU_ENTER:
             self._submenu.append(key_index)
             self._update()
-        elif key_config["kind"] == "BackButton":
+        elif result == keys.KeyPressResult.MENU_BACK:
             self._submenu.pop()
             self._update()
         else:
-            # TODO
-            print(key_index, key_config)
+            print(key_index, key_config, result)
 
     def get_submenu_layout(self):
         """
