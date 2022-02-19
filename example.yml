@@ -2,33 +2,31 @@
 
 keys:
   - kind: SubMenu
-    icon: lightbulb-multiple
-    title: Lights
     values:
+      icon: lightbulb-multiple
+      title: Lights
       keys:
         - kind: HomeAssistantLight
-          icon: lightbulb
-          title: Wall
+          backend: ha-tony
           values:
-            backend: ha-tony
+            icon: lightbulb
+            title: Wall
             entity_id: light.bedroom_window_wall_lamp
         - kind: HomeAssistantLight
-          icon: lightbulb
-          title: Decoration
+          backend: ha-tony
           values:
-            backend: ha-tony
+            icon: lightbulb
+            title: Decoration
             entity_id: light.bedroom_decoration_lamps
         - null
         - null
         - null
         - kind: BackButton
-          icon: arrow-left
-          title: Back
   - kind: HomeAssistantScript
-    icon: theater
-    title: Cinema
+    backend: ha-tony
     values:
-      backend: ha-tony
+      icon: theater
+      title: Cinema
       entity_id: script.cinema_prepare
 frontend:
   kind: GtkFrontend

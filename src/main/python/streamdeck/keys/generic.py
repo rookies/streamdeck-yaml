@@ -23,22 +23,33 @@ class Key(ABC):
     Abstract base class for key classes.
     """
 
-    def __init__(self, key_config):
-        self._config = key_config
+    def __init__(self, values, backend):
+        self._values = values
+        self._backend = backend
+
+        if "icon" in self._values:
+            self._icon = self._values["icon"]
+        elif not hasattr(self, "_icon"):
+            self._icon = "unknown"
+
+        if "title" in self._values:
+            self._title = self._values["title"]
+        elif not hasattr(self, "_title"):
+            self._title = self.__class__.__name__
 
     @property
     def title(self):
         """
         Returns the title for the key.
         """
-        return self._config["title"]
+        return self._title
 
     @property
     def icon_path(self):
         """
         Returns the path to the icon for the key.
         """
-        return os.path.join(ICON_PATH, f"{self._config['icon']}.png")
+        return os.path.join(ICON_PATH, f"{self._icon}.png")
 
     @abstractmethod
     def pressed(self) -> KeyPressResult:
@@ -63,6 +74,9 @@ class BackButton(Key):
     """
     A key that returns back from a submenu.
     """
+
+    _title = "Back"
+    _icon = "arrow-left"
 
     @staticmethod
     def pressed():
