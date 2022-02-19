@@ -9,13 +9,11 @@ keys:
         - kind: HomeAssistantLight
           backend: ha-tony
           values:
-            icon: lightbulb
             title: Wall
             entity_id: light.bedroom_window_wall_lamp
         - kind: HomeAssistantLight
           backend: ha-tony
           values:
-            icon: lightbulb
             title: Decoration
             entity_id: light.bedroom_decoration_lamps
         - null

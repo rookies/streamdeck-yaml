@@ -12,10 +12,15 @@ ICON_PATH = os.path.join(os.path.dirname(__file__), "../../../resources/icons")
 class KeyPressResult(enum.Enum):
     """
     Result of a key press.
+
+    MENU_ENTER: Enter the submenu
+    MENU_BACK: Return from submenu
+    REDRAW: Redraw the display
     """
 
     MENU_ENTER = 1
     MENU_BACK = 2
+    REDRAW = 3
 
 
 class Key(ABC):
@@ -57,6 +62,12 @@ class Key(ABC):
         This method is called when the key is pressed.
         """
         ...
+
+    def _trigger_redraw(self):
+        """
+        Triggers a redraw of all keys.
+        """
+        # TODO: Implement!
 
 
 class SubMenu(Key):

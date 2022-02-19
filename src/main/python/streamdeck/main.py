@@ -61,18 +61,18 @@ class Main:
         for key, backend in self._backends.items():
             threading.Thread(target=backend.run, name=key, daemon=True).start()
 
-        # Update layout and run frontend main loop:
-        self._update()
+        # Create key objects, update layout and run frontend main loop:
+        self._create_keys()
+        self._draw()
         self._frontend.run()
 
-    def _update(self):
+    def _create_keys(self):
         """
-        Updates the layout at the frontend.
+        Creates the key objects.
         """
         submenu_layout = self.get_submenu_layout()
 
         self._keys = []
-        self._frontend.clear()
         for row in range(self.layout["frontend"]["rows"]):
             for col in range(self.layout["frontend"]["columns"]):
                 key_index = row * self.layout["frontend"]["columns"] + col
@@ -96,6 +96,13 @@ class Main:
                 print(f"Loaded key {key_kind} at position ({row},{col})")
                 self._keys.append(key)
 
+    def _draw(self):
+        """
+        Updates the layout at the frontend.
+        """
+        self._frontend.clear()
+        for key_index, key in enumerate(self._keys):
+            if key is not None:
                 self._frontend.set_key(key_index, key.title, key.icon_path)
         self._frontend.draw()
 
@@ -115,14 +122,17 @@ class Main:
 
         key = self._keys[key_index]
         result = key.pressed()
+        print(key_index, key_config, result)
         if result == keys.KeyPressResult.MENU_ENTER:
             self._submenu.append(key_index)
-            self._update()
+            self._create_keys()
+            self._draw()
         elif result == keys.KeyPressResult.MENU_BACK:
             self._submenu.pop()
-            self._update()
-        else:
-            print(key_index, key_config, result)
+            self._create_keys()
+            self._draw()
+        elif result == keys.KeyPressResult.REDRAW:
+            self._draw()
 
     def get_submenu_layout(self):
         """

@@ -26,6 +26,7 @@ class HomeAssistantBackend:
         self._id = 1
         self._get_states_id = -1
         self._entity_states = {}
+        self._handlers = {}
         # TODO: Implement reconnect
 
     def run(self):
@@ -73,6 +74,25 @@ class HomeAssistantBackend:
         """
         return self._entity_states.get(entity_id)
 
+    def register_state_change_handler(self, entity_id, callback):
+        """
+        Registers a handler that is called when the state of the entity with
+        the given changes.
+        """
+        if entity_id not in self._handlers:
+            self._handlers[entity_id] = []
+
+        self._handlers[entity_id].append(callback)
+
+        return (entity_id, len(self._handlers[entity_id]) - 1)
+
+    def unregister_state_change_handler(self, key):
+        """
+        Unregisters the handler with the given key, which was returned when
+        creating the handler.
+        """
+        self._handlers[key[0]].pop(key[1])
+
     def _on_message(self, _, message):
         """
         Handler for received WebSocket messages.
@@ -95,11 +115,21 @@ class HomeAssistantBackend:
             # TODO: What if data["success"] is False?
             for entity in data["result"]:
                 self._entity_states[entity["entity_id"]] = entity["state"]
+                self._call_handlers(entity["entity_id"])
         elif msg_type == "event" and data["event"]["event_type"] == "state_changed":
             # State change received, update entity states:
             self._entity_states[data["event"]["data"]["entity_id"]] = data["event"][
                 "data"
             ]["new_state"]["state"]
+            self._call_handlers(data["event"]["data"]["entity_id"])
+
+    def _call_handlers(self, entity_id):
+        """
+        Calls all registered state change handlers for the entity with
+        the given ID.
+        """
+        for handler in self._handlers.get(entity_id, []):
+            handler(entity_id, self._entity_states[entity_id])
 
     @staticmethod
     def _on_error(_, error):
