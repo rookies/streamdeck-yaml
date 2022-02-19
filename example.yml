@@ -1,0 +1,25 @@
+---
+
+rows: 2
+columns: 3
+keys:
+  - kind: SubMenu
+    icon: lightbulb-multiple
+    title: Lights
+    values:
+      keys:
+        - kind: ToggleButton
+          icon: lightbulb
+          title: Wall
+        - kind: ToggleButton
+          icon: lightbulb
+          title: Decoration
+        - null
+        - null
+        - null
+        - kind: BackButton
+          icon: arrow-left
+          title: Back
+  - kind: PushButton
+    icon: theater
+    title: Cinema
