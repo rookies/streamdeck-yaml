@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 import sys
 import os.path
+import threading
 import yaml
 from GtkFrontend import GtkFrontend
+from HomeAssistant import HomeAssistant
 
 
 class Main:
@@ -16,9 +18,20 @@ class Main:
 
         self._submenu = []
         self._icon_path = os.path.join(os.path.dirname(__file__), "icons")
+        # TODO: Don't hardcode frontend kind
         self._frontend = GtkFrontend(self.layout["rows"], self.layout["columns"], self._callback)
 
+        self._backends = {}
+        for key, backend in self.layout["backends"].items():
+            # TODO: Don't hardcode backend kind
+            self._backends[key] = HomeAssistant(**backend["values"])
+
     def run(self):
+        # Start a thread for each backend:
+        for key, backend in self._backends.items():
+            threading.Thread(target=backend.run, name=key, daemon=True).start()
+
+        # Update layout and run frontend main loop:
         self._update()
         self._frontend.run()
 

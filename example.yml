@@ -23,3 +23,9 @@ keys:
   - kind: PushButton
     icon: theater
     title: Cinema
+backends:
+  ha-tony:
+    kind: HomeAssistant
+    values:
+      url: ...
+      token: ...
