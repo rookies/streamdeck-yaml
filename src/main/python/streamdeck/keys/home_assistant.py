@@ -77,8 +77,8 @@ class HomeAssistantScript(Key):
     A key that can trigger a HomeAssistant script.
     """
 
-    @staticmethod
-    def pressed():
+    def pressed(self):
         # pylint: disable=missing-function-docstring
-        # TODO
-        ...
+        self._backend.call_service(
+            "script", "turn_on", target={"entity_id": self._values["entity_id"]}
+        )
