@@ -12,11 +12,20 @@ class HomeAssistantLight(Key):
     and can control it.
     """
 
-    @staticmethod
-    def pressed():
+    def pressed(self):
         # pylint: disable=missing-function-docstring
-        # TODO
-        ...
+        state = self._backend.get_entity_state(self._values["entity_id"])
+
+        if state == "off":
+            self._backend.call_service(
+                "light", "turn_on", target={"entity_id": self._values["entity_id"]}
+            )
+        elif state == "on":
+            self._backend.call_service(
+                "light", "turn_off", target={"entity_id": self._values["entity_id"]}
+            )
+        else:
+            print(f"Entity {self._values['entity_id']} is in unknown state")
 
 
 class HomeAssistantScript(Key):
