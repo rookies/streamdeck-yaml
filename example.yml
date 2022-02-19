@@ -6,21 +6,30 @@ keys:
     title: Lights
     values:
       keys:
-        - kind: ToggleButton
+        - kind: HomeAssistantLight
           icon: lightbulb
           title: Wall
-        - kind: ToggleButton
+          values:
+            backend: ha-tony
+            entity_id: light.bedroom_window_wall_lamp
+        - kind: HomeAssistantLight
           icon: lightbulb
           title: Decoration
+          values:
+            backend: ha-tony
+            entity_id: light.bedroom_decoration_lamps
         - null
         - null
         - null
         - kind: BackButton
           icon: arrow-left
           title: Back
-  - kind: PushButton
+  - kind: HomeAssistantScript
     icon: theater
     title: Cinema
+    values:
+      backend: ha-tony
+      entity_id: script.cinema_prepare
 frontend:
   kind: GtkFrontend
   rows: 2
