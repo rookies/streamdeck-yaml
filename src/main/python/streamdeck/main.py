@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+"""
+Main application entrypoint.
+"""
 import sys
 import os.path
 import threading
@@ -8,16 +11,22 @@ import backends
 
 
 class Main:
+    """
+    Main application entrypoint.
+    """
+
     def __init__(self, argv):
         if len(argv) != 2:
             print(f"Usage: {argv[0]} layout.yml")
             sys.exit(1)
 
-        with open(argv[1]) as f:
-            self.layout = yaml.safe_load(f)
+        with open(argv[1], encoding="utf8") as file_handle:
+            self.layout = yaml.safe_load(file_handle)
 
         self._submenu = []
-        self._icon_path = os.path.join(os.path.dirname(__file__), "icons")
+        self._icon_path = os.path.join(
+            os.path.dirname(__file__), "../../resources/icons"
+        )
 
         # Load frontend:
         print(f"Available frontends: {', '.join(frontends.AVAILABLE)}")
@@ -25,7 +34,11 @@ class Main:
         if frontend_kind not in frontends.AVAILABLE:
             print(f"Unknown frontend {frontend_kind}")
             sys.exit(1)
-        self._frontend = getattr(frontends, frontend_kind)(self.layout["frontend"]["rows"], self.layout["frontend"]["columns"], self._callback)
+        self._frontend = getattr(frontends, frontend_kind)(
+            self.layout["frontend"]["rows"],
+            self.layout["frontend"]["columns"],
+            self._callback,
+        )
         print(f"Loaded frontend {frontend_kind}")
 
         # Load backends:
@@ -40,6 +53,9 @@ class Main:
             print(f"Loaded backend {backend_kind} as {key}")
 
     def run(self):
+        """
+        Starts the application main loops.
+        """
         # Start a thread for each backend:
         for key, backend in self._backends.items():
             threading.Thread(target=backend.run, name=key, daemon=True).start()
@@ -49,6 +65,9 @@ class Main:
         self._frontend.run()
 
     def _update(self):
+        """
+        Updates the layout at the frontend.
+        """
         submenu_layout = self.get_submenu_layout()
 
         self._frontend.clear()
@@ -62,10 +81,19 @@ class Main:
                 if key_config is None:
                     continue
 
-                self._frontend.set_key(key_index, key_config["title"], os.path.join(self._icon_path, f"{key_config['icon']}.png"))
+                self._frontend.set_key(
+                    key_index,
+                    key_config["title"],
+                    os.path.join(self._icon_path, f"{key_config['icon']}.png"),
+                )
         self._frontend.draw()
 
     def _callback(self, key_index):
+        """
+        This method is called by the frontend when a key is pressed.
+
+        :param key_index: index of the key that was pressed
+        """
         submenu_layout = self.get_submenu_layout()
 
         if key_index >= len(submenu_layout):
@@ -85,6 +113,9 @@ class Main:
             print(key_index, key_config)
 
     def get_submenu_layout(self):
+        """
+        Returns the layout of the currently selected submenu.
+        """
         submenu_layout = self.layout["keys"]
         for i in self._submenu:
             submenu_layout = submenu_layout[i]["values"]["keys"]
@@ -92,5 +123,5 @@ class Main:
         return submenu_layout
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     Main(sys.argv).run()

@@ -1,0 +1,36 @@
+#!/usr/bin/env groovy
+
+plugins {
+  id "base"
+  id "ru.vyarus.use-python" version "2.3.0"
+}
+
+python {
+  pip "pylint:2.12.2"
+  pip "black:22.1.0"
+}
+
+task installDependencies(type: PythonTask) {
+  module = "pip"
+  command = "install -r requirements.txt"
+}
+
+task pylint(type: PythonTask) {
+  module "pylint"
+  command "src/main/python/streamdeck"
+}
+pylint.dependsOn(installDependencies)
+
+task blackCheck(type: PythonTask) {
+  module "black"
+  command "--check src"
+}
+
+task black(type: PythonTask) {
+  module "black"
+  command "src"
+}
+
+task lint
+lint.dependsOn(pylint)
+lint.dependsOn(blackCheck)
