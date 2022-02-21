@@ -47,6 +47,9 @@ class ElgatoFrontend(Frontend):
         # Set image size:
         self.image_size = self._deck.key_image_format()["size"]
 
+        # Create list of blank images:
+        self._images = [None] * rows * columns
+
     def __del__(self):
         if self._deck is not None:
             self._deck.close()
@@ -54,14 +57,19 @@ class ElgatoFrontend(Frontend):
 
     def clear(self):
         # pylint: disable=missing-function-docstring
-        with self._deck:
-            self._deck.reset()
-        # ^- TODO: Move the actual drawing to draw()?
+        for i, _ in enumerate(self._images):
+            self._images[i] = None
 
-    @staticmethod
-    def draw():
+    def draw(self):
         # pylint: disable=missing-function-docstring
-        ...
+        with self._deck:
+            for i, image in enumerate(self._images):
+                if image is None:
+                    native_img = self._deck.BLANK_KEY_IMAGE
+                else:
+                    native_img = PILHelper.to_native_format(self._deck, image)
+
+                self._deck.set_key_image(i, native_img)
 
     def run(self):
         # pylint: disable=missing-function-docstring
@@ -70,11 +78,7 @@ class ElgatoFrontend(Frontend):
 
     def set_key(self, key_index: int, image: Image):
         # pylint: disable=missing-function-docstring
-        with self._deck:
-            self._deck.set_key_image(
-                key_index, PILHelper.to_native_format(self._deck, image)
-            )
-        # ^- TODO: Move the actual drawing to draw()?
+        self._images[key_index] = image
 
     def _keypress(self, _, key_index, state):
         """
