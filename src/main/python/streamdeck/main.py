@@ -125,12 +125,15 @@ class Main:
         submenu_layout = self.get_submenu_layout()
 
         if key_index >= len(submenu_layout):
+            logger.info("Key #%d pressed, but it has no mapping", key_index)
             return
         key_config = submenu_layout[key_index]
         if key_config is None:
+            logger.info("Key #%d pressed, but it's mapping is null", key_index)
             return
 
         key = self._keys[key_index]
+        logger.info("Key #%d (%s) pressed, calling handler", key_index, type(key))
         result = key.pressed()
         logger.debug(
             "Keypress handler for key #%d (%s) returned %s",
@@ -140,13 +143,16 @@ class Main:
         )
         if result == keys.KeyPressResult.MENU_ENTER:
             self._submenu.append(key_index)
+            logger.info("Entering submenu %s", self._submenu)
             self._create_keys()
             self._draw()
         elif result == keys.KeyPressResult.MENU_BACK:
             self._submenu.pop()
+            logger.info("Going back to submenu %s", self._submenu)
             self._create_keys()
             self._draw()
         elif result == keys.KeyPressResult.REDRAW:
+            logger.info("Redrawing frontend")
             self._draw()
 
     def get_submenu_layout(self):
