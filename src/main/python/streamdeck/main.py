@@ -129,7 +129,7 @@ class Main:
             return
         key_config = submenu_layout[key_index]
         if key_config is None:
-            logger.info("Key #%d pressed, but it's mapping is null", key_index)
+            logger.info("Key #%d pressed, but its mapping is null", key_index)
             return
 
         key = self._keys[key_index]

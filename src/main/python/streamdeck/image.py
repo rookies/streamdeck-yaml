@@ -23,8 +23,15 @@ class ImageRenderer:
         """
         Renders an image for the given key and returns the Pillow image.
         """
-        # Create blank image:
-        result = Image.new("RGBA", self._size, (255, 255, 255))
+        # Create blank, black image:
+        result = Image.new("RGBA", self._size, (0, 0, 0))
+        result_draw = ImageDraw.Draw(result)
+
+        # Add white, rounded rectangle as background:
+        result_draw.rounded_rectangle(
+            [(0, 0), self._size], 15, fill=(255, 255, 255), outline=(100, 100, 100)
+        )
+        # ^- TODO: Don't hardcode corner radius?
 
         # Add icon:
         with Image.open(os.path.join(ICON_PATH, f"{key.icon}.png")).convert(
@@ -36,12 +43,11 @@ class ImageRenderer:
 
         # Add text:
         font = self._get_fitting_font(key.title)
-        result_draw = ImageDraw.Draw(result)
         result_draw.text(
             (result.size[0] // 2, result.size[1] - self._config["padding"]),
             key.title,
             font=font,
-            anchor="mb",
+            anchor="ms",
             fill=(0, 0, 0),
         )
 

@@ -57,13 +57,13 @@ keys:
             entity_id: script.cinema_prepare
         - kind: BackButton
 frontend:
-  kind: GtkFrontend
+  kind: ElgatoFrontend
   rows: 2
   columns: 3
 style:
   font: /usr/share/fonts/TTF/OpenSans-Bold.ttf
   max_fontsize: 15
-  padding: 2
+  padding: 7
 backends:
   ha-tony:
     kind: HomeAssistantBackend

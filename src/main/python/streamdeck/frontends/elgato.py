@@ -11,6 +11,7 @@ from StreamDeck.ImageHelpers import PILHelper
 from frontends import Frontend
 
 logger = logging.getLogger("streamdeck.frontends.elgato")
+# TODO: Implement automatic reconnect
 
 
 class ElgatoFrontend(Frontend):
