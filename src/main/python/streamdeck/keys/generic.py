@@ -34,24 +34,26 @@ class Key(ABC):
         elif not hasattr(self, "_icon"):
             self._icon = "help"
 
+        if "icon_color" in self._values:
+            self._icon_color = self._values["icon_color"]
+        elif not hasattr(self, "_icon_color"):
+            self._icon_color = "black"
+
         if "title" in self._values:
             self._title = self._values["title"]
         elif not hasattr(self, "_title"):
             self._title = self.__class__.__name__
 
     @property
-    def title(self):
+    def appearance(self):
         """
-        Returns the title for the key.
+        Returns the appearance of the key.
         """
-        return self._title
-
-    @property
-    def icon(self):
-        """
-        Returns the name of the icon for the key.
-        """
-        return self._icon
+        return {
+            "title": self._title,
+            "icon": self._icon,
+            "icon_color": self._icon_color,
+        }
 
     @abstractmethod
     def pressed(self) -> KeyPressResult:

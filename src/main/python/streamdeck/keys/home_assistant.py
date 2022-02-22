@@ -27,6 +27,19 @@ class HomeAssistantToggle(Key):
         },
     }
 
+    _icon_color_by_domain_and_state = {
+        "light": {
+            "on": "#fdd835",
+            "off": "black",
+            "unknown": "black",
+        },
+        "switch": {
+            "on": "#44739e",
+            "off": "black",
+            "unknown": "black",
+        },
+    }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -36,6 +49,7 @@ class HomeAssistantToggle(Key):
 
         self._domain = self._values["entity_id"].split(".")[0]
         self._icon_by_state = self._icon_by_domain_and_state[self._domain]
+        self._icon_color_by_state = self._icon_color_by_domain_and_state[self._domain]
 
         state = self._backend.get_entity_state(self._values["entity_id"])
         self._set_icon(state)
@@ -83,8 +97,10 @@ class HomeAssistantToggle(Key):
         """
         if state in self._icon_by_state:
             self._icon = self._icon_by_state[state]
+            self._icon_color = self._icon_color_by_state[state]
         else:
             self._icon = self._icon_by_state["unknown"]
+            self._icon_color = self._icon_color_by_state["unknown"]
 
 
 class HomeAssistantScript(Key):
