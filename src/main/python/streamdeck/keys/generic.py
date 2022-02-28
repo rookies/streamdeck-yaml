@@ -4,15 +4,16 @@ Contains an abstract base class for key classes as well as some generic key clas
 """
 import enum
 from abc import ABC, abstractmethod
+from typing import Tuple
 
 
 class KeyPressResult(enum.Enum):
     """
     Result of a key press.
 
-    MENU_ENTER: Enter the submenu
-    MENU_BACK: Return from submenu
-    REDRAW: Redraw the display
+    MENU_ENTER: Enter the submenu given as `details`
+    MENU_BACK: Return from submenu, `details` is None
+    REDRAW: Redraw the display, `details` is None
     """
 
     MENU_ENTER = 1
@@ -56,9 +57,11 @@ class Key(ABC):
         }
 
     @abstractmethod
-    def pressed(self) -> KeyPressResult:
+    def pressed(self) -> Tuple[KeyPressResult, dict]:
         """
         This method is called when the key is pressed.
+
+        :return: a tuple (result, details)
         """
         ...
 
@@ -74,10 +77,9 @@ class SubMenu(Key):
     A key that enters a submenu.
     """
 
-    @staticmethod
-    def pressed():
+    def pressed(self):
         # pylint: disable=missing-function-docstring
-        return KeyPressResult.MENU_ENTER
+        return KeyPressResult.MENU_ENTER, self._values["keys"]
 
 
 class BackButton(Key):
@@ -91,4 +93,4 @@ class BackButton(Key):
     @staticmethod
     def pressed():
         # pylint: disable=missing-function-docstring
-        return KeyPressResult.MENU_BACK
+        return KeyPressResult.MENU_BACK, None

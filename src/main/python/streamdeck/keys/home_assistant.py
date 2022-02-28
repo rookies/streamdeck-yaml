@@ -81,7 +81,7 @@ class HomeAssistantToggle(Key):
             )
             self._set_icon("unknown")
 
-        return KeyPressResult.REDRAW
+        return KeyPressResult.REDRAW, None
 
     def _statechange(self, _, state):
         """
@@ -114,3 +114,5 @@ class HomeAssistantScript(Key):
         self._backend.call_service(
             "script", "turn_on", target={"entity_id": self._values["entity_id"]}
         )
+
+        return None, None

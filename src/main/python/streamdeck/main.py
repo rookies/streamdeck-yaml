@@ -40,7 +40,7 @@ class Main:
         with open(layout_file, encoding="utf8") as file_handle:
             self.layout = yaml.safe_load(file_handle)
 
-        self._submenu = []
+        self._submenu_stack = [self.layout["keys"]]
         self._keys = []
 
         # Load frontend:
@@ -90,16 +90,14 @@ class Main:
         """
         Creates the key objects.
         """
-        submenu_layout = self.get_submenu_layout()
-
         self._keys = []
         for row in range(self.layout["frontend"]["rows"]):
             for col in range(self.layout["frontend"]["columns"]):
                 key_index = row * self.layout["frontend"]["columns"] + col
 
-                if key_index >= len(submenu_layout):
+                if key_index >= len(self.submenu_layout):
                     break
-                key_config = submenu_layout[key_index]
+                key_config = self.submenu_layout[key_index]
                 if key_config is None:
                     self._keys.append(None)
                     continue
@@ -132,19 +130,17 @@ class Main:
 
         :param key_index: index of the key that was pressed
         """
-        submenu_layout = self.get_submenu_layout()
-
-        if key_index >= len(submenu_layout):
+        if key_index >= len(self.submenu_layout):
             logger.info("Key #%d pressed, but it has no mapping", key_index)
             return
-        key_config = submenu_layout[key_index]
+        key_config = self.submenu_layout[key_index]
         if key_config is None:
             logger.info("Key #%d pressed, but its mapping is null", key_index)
             return
 
         key = self._keys[key_index]
         logger.info("Key #%d (%s) pressed, calling handler", key_index, type(key))
-        result = key.pressed()
+        result, details = key.pressed()
         logger.debug(
             "Keypress handler for key #%d (%s) returned %s",
             key_index,
@@ -152,28 +148,31 @@ class Main:
             result,
         )
         if result == keys.KeyPressResult.MENU_ENTER:
-            self._submenu.append(key_index)
-            logger.info("Entering submenu %s", self._submenu)
+            self._submenu_stack.append(details)
+            logger.info("Entering submenu at level %d", len(self._submenu_stack) - 1)
             self._create_keys()
             self._draw()
         elif result == keys.KeyPressResult.MENU_BACK:
-            self._submenu.pop()
-            logger.info("Going back to submenu %s", self._submenu)
+            if len(self._submenu_stack) == 1:
+                logger.warning("Sorry, there's no way back from here")
+                return
+
+            self._submenu_stack.pop()
+            logger.info(
+                "Going back to submenu at level %d", len(self._submenu_stack) - 1
+            )
             self._create_keys()
             self._draw()
         elif result == keys.KeyPressResult.REDRAW:
             logger.info("Redrawing frontend")
             self._draw()
 
-    def get_submenu_layout(self):
+    @property
+    def submenu_layout(self):
         """
         Returns the layout of the currently selected submenu.
         """
-        submenu_layout = self.layout["keys"]
-        for i in self._submenu:
-            submenu_layout = submenu_layout[i]["values"]["keys"]
-
-        return submenu_layout
+        return self._submenu_stack[-1]
 
 
 @app.command()
