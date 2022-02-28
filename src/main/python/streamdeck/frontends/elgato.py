@@ -11,7 +11,6 @@ from StreamDeck.ImageHelpers import PILHelper
 from frontends import Frontend
 
 logger = logging.getLogger("streamdeck.frontends.elgato")
-# TODO: Implement automatic reconnect
 
 
 class ElgatoFrontend(Frontend):
@@ -21,22 +20,14 @@ class ElgatoFrontend(Frontend):
     """
 
     _deck = None
+    _deck_serial_number = None
 
     def __init__(self, rows, columns, callback):
-        decks = DeviceManager().enumerate()
-        if len(decks) != 1:
-            raise RuntimeError("Found no or multiple streamdecks")
-        self._deck = decks[0]
-        self._deck.open()
-        self._deck.reset()
-        logger.info(
-            "Opened device %s with serial number %s",
-            self._deck.deck_type(),
-            self._deck.get_serial_number(),
-        )
+        # Try to connect to device:
+        if not self._connect():
+            raise RuntimeError("No streamdeck found")
 
         # Register callback:
-        self._deck.set_key_callback(self._keypress)
         self._callback = callback
 
         # Check if layout matches:
@@ -52,6 +43,38 @@ class ElgatoFrontend(Frontend):
         self._images = [None] * rows * columns
 
     def __del__(self):
+        self._disconnect()
+
+    def _connect(self):
+        decks = DeviceManager().enumerate()
+        for deck in decks:
+            try:
+                deck.open()
+                deck_serial_number = deck.get_serial_number()
+            finally:
+                deck.close()
+
+            if (
+                self._deck_serial_number is None
+                or self._deck_serial_number == deck_serial_number
+            ):
+                self._deck = deck
+                self._deck_serial_number = deck_serial_number
+
+                self._deck.open()
+                self._deck.reset()
+                logger.info(
+                    "Opened device %s with serial number %s",
+                    self._deck.deck_type(),
+                    self._deck_serial_number,
+                )
+                self._deck.set_key_callback(self._keypress)
+                return True
+
+        logger.warning("Failed to reconnect")
+        return False
+
+    def _disconnect(self):
         if self._deck is not None:
             self._deck.close()
             self._deck = None
@@ -74,7 +97,12 @@ class ElgatoFrontend(Frontend):
 
     def run(self):
         # pylint: disable=missing-function-docstring
-        while self._deck.is_open():
+        while True:  # TODO: Add stop signal?
+            if self._deck is None:
+                if self._connect():
+                    self.draw()
+            elif not self._deck.connected():
+                self._disconnect()
             time.sleep(1)
 
     def set_key(self, key_index: int, image: Image):
