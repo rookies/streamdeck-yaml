@@ -3,15 +3,30 @@
 Main application entrypoint.
 """
 import sys
+import enum
 import logging
 import threading
 import yaml
+import typer
 import frontends
 import backends
 import keys
 from image import ImageRenderer
 
 logger = logging.getLogger("streamdeck.main")
+app = typer.Typer()
+
+
+class LogLevel(str, enum.Enum):
+    """
+    Log level, used to check the corresponding command line parameter.
+    """
+
+    DEBUG = "DEBUG"
+    INFO = "INFO"
+    WARNING = "WARNING"
+    ERROR = "ERROR"
+    CRITICAL = "CRITICAL"
 
 
 class Main:
@@ -19,15 +34,10 @@ class Main:
     Main application entrypoint.
     """
 
-    def __init__(self, argv):
-        logging.basicConfig(level=logging.INFO)
-        # ^- TODO: Make this configurable!
+    def __init__(self, layout_file: str, loglevel: str):
+        logging.basicConfig(level=getattr(logging, loglevel))
 
-        if len(argv) != 2:
-            print(f"Usage: {argv[0]} layout.yml", file=sys.stderr)
-            sys.exit(1)
-
-        with open(argv[1], encoding="utf8") as file_handle:
+        with open(layout_file, encoding="utf8") as file_handle:
             self.layout = yaml.safe_load(file_handle)
 
         self._submenu = []
@@ -166,5 +176,17 @@ class Main:
         return submenu_layout
 
 
+@app.command()
+def main(
+    layout: str = typer.Argument(..., help="path to the layout YAML file"),
+    loglevel: LogLevel = typer.Option("INFO", help="loglevel to use"),
+):
+    """
+    Wrapper around the main class, used for typer.
+    """
+    instance = Main(layout, loglevel)
+    instance.run()
+
+
 if __name__ == "__main__":
-    Main(sys.argv).run()
+    app()

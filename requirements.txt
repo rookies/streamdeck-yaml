@@ -3,4 +3,5 @@ websocket-client == 1.2.3
 Pillow == 9.0.1
 streamdeck == 0.9.0
 numpy == 1.22.2
+typer == 0.4.0
 # TODO: Gtk
