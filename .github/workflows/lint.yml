@@ -12,5 +12,5 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-      - run: sudo apt install libgirepository1.0-dev
+      - run: sudo apt install libgirepository1.0-dev libgtk-3-0
       - run: gradle clean lint
