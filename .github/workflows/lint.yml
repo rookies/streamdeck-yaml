@@ -12,4 +12,5 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+      - run: sudo apt install libgirepository1.0-dev
       - run: gradle clean lint
