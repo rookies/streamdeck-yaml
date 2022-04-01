@@ -16,7 +16,6 @@ class Frontend(ABC):
         """
         Clears all keys without actually updating them.
         """
-        ...
 
     @abstractmethod
     def draw(self):
@@ -24,18 +23,15 @@ class Frontend(ABC):
         Updates the keys with the current configuration set via clear() and
         set_key().
         """
-        ...
 
     @abstractmethod
     def run(self):
         """
         Implements the frontend main loop.
         """
-        ...
 
     @abstractmethod
     def set_key(self, key_index: int, image: Image):
         """
         Sets the image for the key with the given index.
         """
-        ...

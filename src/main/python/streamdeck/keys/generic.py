@@ -63,7 +63,6 @@ class Key(ABC):
 
         :return: a tuple (result, details)
         """
-        ...
 
     def _trigger_redraw(self):
         """
@@ -90,7 +89,6 @@ class BackButton(Key):
     _title = "Back"
     _icon = "arrow-left"
 
-    @staticmethod
-    def pressed():
+    def pressed(self):
         # pylint: disable=missing-function-docstring
         return KeyPressResult.MENU_BACK, None
