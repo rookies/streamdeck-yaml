@@ -6,8 +6,8 @@ plugins {
 }
 
 python {
-  pip "pylint:2.12.2"
-  pip "black:22.1.0"
+  pip "pylint:2.13.4"
+  pip "black:22.3.0"
 }
 
 task installDependencies(type: PythonTask) {
