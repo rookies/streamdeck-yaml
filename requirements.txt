@@ -1,7 +1,7 @@
 PyYAML == 6.0
 websocket-client == 1.3.2
 Pillow == 9.1.0
-streamdeck == 0.9.0
+streamdeck == 0.9.1
 numpy == 1.22.3
 typer == 0.4.1
 PyGObject == 3.42.0
