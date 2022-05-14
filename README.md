@@ -8,6 +8,10 @@ integration and configured using a YAML file.
 
 ![Example menu](https://raw.githubusercontent.com/rookies/mywebsite-blogposts/master/2022-05-14_streamdeck-yaml/05.jpg)
 
+## Requirements
+* for base requirements, see [requirements.txt](requirements.txt)
+* for the GTK frontend: PyGObject, Gtk 3, GdkPixbuf 2, GLib
+
 ## Icons
 The icons used by the application and included in `src/main/resources/icons` are from the
 [Material Design Icons](https://github.com/Templarian/MaterialDesign), see
@@ -18,3 +22,5 @@ The icons used by the application and included in `src/main/resources/icons` are
   want to use a graphical interface to configure your deck
 * [python-elgato-streamdeck by abcminiuser](https://github.com/abcminiuser/python-elgato-streamdeck)
   — if you want to code your own custom UI in Python, streamdeck-yaml also uses this library
+
+TODO: Create Docker image
