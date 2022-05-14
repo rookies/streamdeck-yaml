@@ -50,9 +50,8 @@ class Main:
             logger.error("Unknown frontend: %s", frontend_kind)
             sys.exit(1)
         self._frontend = getattr(frontends, frontend_kind)(
-            self.layout["frontend"]["rows"],
-            self.layout["frontend"]["columns"],
             self._callback,
+            **self.layout["frontend"],
         )
         logger.info("Loaded frontend %s", frontend_kind)
 
@@ -130,6 +129,13 @@ class Main:
 
         :param key_index: index of the key that was pressed
         """
+        # Enable frontend and skip action if it was disabled:
+        if not self._frontend.enabled:
+            logger.info("Frontend was disabled, enabling it")
+            self._frontend.enable()
+            self._draw()
+            return
+
         if key_index >= len(self.submenu_layout):
             logger.info("Key #%d pressed, but it has no mapping", key_index)
             return

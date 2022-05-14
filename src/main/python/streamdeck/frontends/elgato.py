@@ -22,25 +22,24 @@ class ElgatoFrontend(Frontend):
     _deck = None
     _deck_serial_number = None
 
-    def __init__(self, rows, columns, callback):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
         # Try to connect to device:
         if not self._connect():
             raise RuntimeError("No streamdeck found")
 
-        # Register callback:
-        self._callback = callback
-
         # Check if layout matches:
-        if self._deck.key_layout() != (rows, columns):
+        if self._deck.key_layout() != self._layout:
             raise RuntimeError(
-                f"Streamdeck layout {self._deck.key_layout()} doesn't match expected ({rows},{columns})"
+                f"Streamdeck layout {self._deck.key_layout()} doesn't match expected ({self._layout})"
             )
 
         # Set image size:
         self.image_size = self._deck.key_image_format()["size"]
 
         # Create list of blank images:
-        self._images = [None] * rows * columns
+        self._images = [None] * self._layout[0] * self._layout[1]
 
     def __del__(self):
         self._disconnect()
@@ -103,15 +102,28 @@ class ElgatoFrontend(Frontend):
                     self.draw()
             elif not self._deck.connected():
                 self._disconnect()
+
+            self._timer_callback()
             time.sleep(1)
 
     def set_key(self, key_index: int, image: Image):
         # pylint: disable=missing-function-docstring
         self._images[key_index] = image
 
+    def disable(self):
+        # pylint: disable=missing-function-docstring
+        self._deck.set_brightness(0)
+        super().disable()
+
+    def enable(self):
+        # pylint: disable=missing-function-docstring
+        self._deck.set_brightness(100)
+        super().enable()
+
     def _keypress(self, _, key_index, state):
         """
         Callback function for key presses.
         """
+        self._update_last_action()
         if state:
             self._callback(key_index)

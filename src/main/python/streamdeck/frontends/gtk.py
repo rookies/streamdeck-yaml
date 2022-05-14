@@ -18,21 +18,23 @@ class GtkFrontend(Frontend):
 
     image_size = (80, 80)
 
-    def __init__(self, rows, columns, callback):
-        self._layout = (rows, columns)
-        self._callback = callback
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
+        # Initialize window:
         self._window = Gtk.Window()
         self._window.connect("destroy", Gtk.main_quit)
 
+        # Initialize grid:
         self._grid = Gtk.Grid()
         self._grid.set_row_homogeneous(True)
         self._grid.set_column_homogeneous(True)
         self._window.add(self._grid)
 
+        # Initialize buttons:
         self._buttons = []
-        for row in range(rows):
-            for col in range(columns):
+        for row in range(self._layout[0]):
+            for col in range(self._layout[1]):
                 button = Gtk.Button()
 
                 key_index = row * self._layout[1] + col
@@ -40,6 +42,9 @@ class GtkFrontend(Frontend):
 
                 self._buttons.append(button)
                 self._grid.attach(button, col, row, 1, 1)
+
+        # Initialize regular timer:
+        GLib.timeout_add(1000, self._timer_callback)
 
     def clear(self):
         # pylint: disable=missing-function-docstring
@@ -72,8 +77,14 @@ class GtkFrontend(Frontend):
         self._buttons[key_index].set_image(gtk_image)
         self._buttons[key_index].set_always_show_image(True)
 
+    def disable(self):
+        # pylint: disable=missing-function-docstring
+        self.clear()
+        super().disable()
+
     def _keypress(self, _, key_index):
         """
         Callback function for key presses.
         """
+        self._update_last_action()
         self._callback(key_index)
