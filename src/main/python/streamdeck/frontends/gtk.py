@@ -2,13 +2,27 @@
 """
 Gtk frontend, useful for development purposes
 """
-import gi
+import logging
 from PIL import Image
 from frontends import Frontend
 
-gi.require_version("Gtk", "3.0")
-gi.require_version("GdkPixbuf", "2.0")
-from gi.repository import Gtk, GdkPixbuf, GLib  # pylint: disable=wrong-import-position
+logger = logging.getLogger("streamdeck.frontends.gtk")
+
+try:
+    import gi
+
+    gi.require_version("Gtk", "3.0")
+    gi.require_version("GdkPixbuf", "2.0")
+    from gi.repository import (
+        Gtk,
+        GdkPixbuf,
+        GLib,
+    )  # pylint: disable=wrong-import-position
+except ModuleNotFoundError as e:
+    logger.warning("GTK Frontend is disabled because of missing modules: %s", e)
+    MODULE_FOUND = False
+else:
+    MODULE_FOUND = True
 
 
 class GtkFrontend(Frontend):
@@ -19,6 +33,9 @@ class GtkFrontend(Frontend):
     image_size = (80, 80)
 
     def __init__(self, *args, **kwargs):
+        if not MODULE_FOUND:
+            raise RuntimeError("Missing Python modules for GTK Frontend")
+
         super().__init__(*args, **kwargs)
 
         # Initialize window:
