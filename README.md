@@ -6,6 +6,8 @@ streamdeck-yaml
 Cross-platform compatible UI for devices like the Elgato Stream Decks. With HomeAssistant
 integration and configured using a YAML file.
 
+![Example menu](https://raw.githubusercontent.com/rookies/mywebsite-blogposts/master/2022-05-14_streamdeck-yaml/05.jpg)
+
 ## Icons
 The icons used by the application and included in `src/main/resources/icons` are from the
 [Material Design Icons](https://github.com/Templarian/MaterialDesign), see
