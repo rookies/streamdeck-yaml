@@ -1,4 +1,4 @@
 PyYAML == 6.0
-websocket-client == 1.3.2
+websocket-client == 1.3.3
 streamdeck == 0.9.1
 typer == 0.4.1
