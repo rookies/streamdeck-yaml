@@ -56,6 +56,24 @@ keys:
             title: Cinema
             entity_id: script.cinema_prepare
         - kind: BackButton
+  - kind: SubMenu
+    values:
+      title: AC
+      icon: fan
+      keys:
+        - kind: HomeAssistantToggle
+          backend: ha-tony
+          values:
+            icon: air-humidifier
+            title: Dehumid
+            entity_id: switch.dehumidifier_pwr
+        - kind: HomeAssistantToggle
+          backend: ha-tony
+          values:
+            icon: fan
+            title: Fan
+            entity_id: switch.windowfan_pwr
+        - kind: BackButton
 frontend:
   kind: ElgatoFrontend
   rows: 2

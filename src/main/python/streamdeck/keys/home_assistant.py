@@ -48,7 +48,14 @@ class HomeAssistantToggle(Key):
         )
 
         self._domain = self._values["entity_id"].split(".")[0]
-        self._icon_by_state = self._icon_by_domain_and_state[self._domain]
+        if "icon" in self._values:
+            self._icon_by_state = {
+                "on": self._values["icon"],
+                "off": self._values["icon"],
+                "unknown": self._values["icon"],
+            }
+        else:
+            self._icon_by_state = self._icon_by_domain_and_state[self._domain]
         self._icon_color_by_state = self._icon_color_by_domain_and_state[self._domain]
 
         state = self._backend.get_entity_state(self._values["entity_id"])
