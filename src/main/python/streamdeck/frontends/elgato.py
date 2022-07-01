@@ -41,6 +41,8 @@ class ElgatoFrontend(Frontend):
         # Create list of blank images:
         self._images = [None] * self._layout[0] * self._layout[1]
 
+        self.enable()
+
     def __del__(self):
         self._disconnect()
 
