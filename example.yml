@@ -73,6 +73,9 @@ keys:
             icon: fan
             title: Fan
             entity_id: switch.windowfan_pwr
+        - null
+        - null
+        - null
         - kind: BackButton
 frontend:
   kind: ElgatoFrontend
