@@ -2,7 +2,7 @@
 Description=streamdeck-yaml
 
 [Service]
-ExecStart=/bin/sh -c '%h/software/streamdeck-yaml/run.sh config.yml 2>&1 > /tmp/streamdeck-yaml.%u.log'
+ExecStart=/bin/sh -c '%h/software/streamdeck-yaml/run.sh config.yml 2>&1 | tee /tmp/streamdeck-yaml.%u.log'
 Restart=always
 RestartSec=10
 
