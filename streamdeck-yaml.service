@@ -1,0 +1,10 @@
+[Unit]
+Description=streamdeck-yaml
+
+[Service]
+ExecStart=%h/software/streamdeck-yaml/run.sh example.yml
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
