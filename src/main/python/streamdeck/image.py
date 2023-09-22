@@ -70,7 +70,7 @@ class ImageRenderer:
         for size in range(1, self._config["max_fontsize"] + 1):
             font = ImageFont.truetype(self._config["font"], size)
 
-            if font.getsize(text)[0] > (self._size[0] - 2 * self._config["padding"]):
+            if font.getlength(text) > (self._size[0] - 2 * self._config["padding"]):
                 return last_font
             last_font = font
 
