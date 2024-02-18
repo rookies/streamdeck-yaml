@@ -3,6 +3,7 @@
 HomeAssistant backend
 """
 import ssl
+import time
 import json
 import logging
 from typing import Optional
@@ -12,34 +13,42 @@ logger = logging.getLogger("streamdeck.backends.home_assistant")
 
 
 class HomeAssistantBackend:
+    # pylint: disable=too-many-instance-attributes
     """
     HomeAssistant backend
     """
 
     def __init__(self, url, token, insecure=False):
-        self._ws = websocket.WebSocketApp(
-            url,
-            on_open=self._on_open,
-            on_message=self._on_message,
-            on_error=self._on_error,
-            on_close=self._on_close,
-        )
+        self._url = url
         self._access_token = token
         self._insecure = insecure
         self._id = 1
         self._get_states_id = -1
         self._entity_states = {}
         self._handlers = {}
-        # TODO: Implement reconnect
+
+        self._connect()
+
+    def _connect(self):
+        self._ws = websocket.WebSocketApp(
+            self._url,
+            on_open=self._on_open,
+            on_message=self._on_message,
+            on_error=self._on_error,
+            on_close=self._on_close,
+        )
 
     def run(self):
         """
         Implements the backend main loop.
         """
-        if self._insecure:
-            self._ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
-        else:
-            self._ws.run_forever()
+        while True:
+            if self._insecure:
+                self._ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+            else:
+                self._ws.run_forever()
+
+            time.sleep(1)
 
     def call_service(
         self,
@@ -144,12 +153,12 @@ class HomeAssistantBackend:
         """
         logger.error("WebSocket error: %s", error)
 
-    @staticmethod
-    def _on_close(_, status_code, msg):
+    def _on_close(self, _, status_code, msg):
         """
         Handler that is called when the WebSocket connection is closed.
         """
-        logger.info("WebSocket connection closed: %d %s", status_code, msg)
+        logger.info("WebSocket connection closed: %s %s", status_code, msg)
+        self._connect()
 
     @staticmethod
     def _on_open(_):
