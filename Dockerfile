@@ -1,4 +1,4 @@
-FROM alpine:3.15
+FROM alpine:3.21
 
 COPY requirements.txt /
 RUN apk add --no-cache python3 \
@@ -6,7 +6,9 @@ RUN apk add --no-cache python3 \
     py3-numpy \
     py3-pillow \
     hidapi && \
-  pip install -r /requirements.txt
+  python -m venv --system-site-packages /venv && \
+  PATH=/venv/bin:$PATH pip install -r /requirements.txt
 COPY src /app/src
 
-ENTRYPOINT ["python3", "/app/src/main/python/streamdeck/main.py"]
+ENV PATH="/venv/bin:$PATH"
+ENTRYPOINT ["python", "/app/src/main/python/streamdeck/main.py"]
