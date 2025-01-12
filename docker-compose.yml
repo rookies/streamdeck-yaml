@@ -1,0 +1,9 @@
+services:
+  streamdeck-yaml:
+    image: streamdeck-yaml:latest
+    build: .
+    restart: always
+    volumes:
+      - ${PWD}:/hostdir:ro
+    privileged: true
+    command: /hostdir/config.yml
