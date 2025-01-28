@@ -58,7 +58,7 @@ class HomeAssistantToggle(Key):
             self._icon_by_state = self._icon_by_domain_and_state[self._domain]
         self._icon_color_by_state = self._icon_color_by_domain_and_state[self._domain]
 
-        state = self._backend.get_entity_state(self._values["entity_id"])
+        state = self._get_state()
         self._set_icon(state)
 
     def __del__(self):
@@ -68,7 +68,7 @@ class HomeAssistantToggle(Key):
 
     def pressed(self):
         # pylint: disable=missing-function-docstring
-        state = self._backend.get_entity_state(self._values["entity_id"])
+        state = self._get_state()
 
         if state == "off":
             self._backend.call_service(
@@ -90,11 +90,14 @@ class HomeAssistantToggle(Key):
 
         return KeyPressResult.REDRAW, None
 
-    def _statechange(self, _, state):
+    def _get_state(self):
+        return self._backend.get_entity_info(self._values["entity_id"])["state"]
+
+    def _statechange(self, entity_info):
         """
         Callback for entity state changes.
         """
-        self._set_icon(state)
+        self._set_icon(entity_info["state"])
 
         self._trigger_redraw()
 
@@ -123,3 +126,98 @@ class HomeAssistantScript(Key):
         )
 
         return None, None
+
+
+class HomeAssistantClimatePreset(Key):
+    """
+    A key that can switch the climate preset in HomeAssistant.
+    """
+
+    _icon_by_state = {
+        "none": "thermometer",
+        "frost": "snowflake-thermometer",
+        "eco": "leaf",
+        "comfort": "sofa",
+        "boost": "rocket-launch",
+        "unknown": "help",
+    }
+
+    _icon_color_by_state = {
+        "none": "black",
+        "frost": "#fdd835",
+        "eco": "#fdd835",
+        "comfort": "#fdd835",
+        "boost": "#fdd835",
+        "unknown": "black",
+    }
+
+    _next_preset_by_state = {
+        "none": "frost",
+        "frost": "eco",
+        "eco": "comfort",
+        "comfort": "boost",
+        "boost": "frost",
+        "unknown": "frost",
+    }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._handler_key = self._backend.register_state_change_handler(
+            self._values["entity_id"], self._statechange
+        )
+
+        preset_mode = self._get_preset_mode()
+        self._set_icon(preset_mode)
+
+    def __del__(self):
+        self._backend.unregister_state_change_handler(self._handler_key)
+
+        super().__del__()
+
+    def pressed(self):
+        # pylint: disable=missing-function-docstring
+        preset_mode = self._get_preset_mode()
+        if preset_mode in self._next_preset_by_state:
+            next_preset_mode = self._next_preset_by_state[preset_mode]
+        else:
+            next_preset_mode = self._next_preset_by_state["unknown"]
+            logger.warning(
+                "Entity %s is in unknown preset mode: %s",
+                self._values["entity_id"],
+                preset_mode,
+            )
+
+        self._backend.call_service(
+            "climate",
+            "set_preset_mode",
+            target={"entity_id": self._values["entity_id"]},
+            data={"preset_mode": next_preset_mode},
+        )
+        self._set_icon(next_preset_mode)
+
+        return KeyPressResult.REDRAW, None
+
+    def _get_preset_mode(self):
+        return self._backend.get_entity_info(self._values["entity_id"])["attributes"][
+            "preset_mode"
+        ]
+
+    def _statechange(self, entity_info):
+        """
+        Callback for entity state changes.
+        """
+        self._set_icon(entity_info["attributes"]["preset_mode"])
+
+        self._trigger_redraw()
+
+    def _set_icon(self, preset_mode):
+        """
+        Sets the icon according to the given preset mode.
+        """
+        if preset_mode in self._icon_by_state:
+            self._icon = self._icon_by_state[preset_mode]
+            self._icon_color = self._icon_color_by_state[preset_mode]
+        else:
+            self._icon = self._icon_by_state["unknown"]
+            self._icon_color = self._icon_color_by_state["unknown"]

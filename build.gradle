@@ -2,34 +2,30 @@
 
 plugins {
   id "base"
-  id "ru.vyarus.use-python" version "2.3.0"
+  id "ru.vyarus.use-python" version "4.1.0"
 }
 
-python {
-  pip "pylint:2.13.9"
-  pip "black:22.3.0"
-}
-
-task installDependencies(type: PythonTask) {
-  module = "pip"
-  command = "install -r requirements.txt"
+task installDependenciesTest(type: PipInstallTask) {
+  requirements = file("requirements-test.txt")
 }
 
 task pylint(type: PythonTask) {
-  module "pylint"
-  command "src/main/python/streamdeck"
+  module = "pylint"
+  command = "src/main/python/streamdeck"
 }
-pylint.dependsOn(installDependencies)
+pylint.dependsOn(installDependenciesTest)
 
 task blackCheck(type: PythonTask) {
-  module "black"
-  command "--check src"
+  module = "black"
+  command = "--check src"
 }
+blackCheck.dependsOn(installDependenciesTest)
 
 task black(type: PythonTask) {
-  module "black"
-  command "src"
+  module = "black"
+  command = "src"
 }
+black.dependsOn(installDependenciesTest)
 
 task lint
 lint.dependsOn(pylint)
