@@ -24,7 +24,7 @@ class HomeAssistantBackend:
         self._insecure = insecure
         self._id = 1
         self._get_states_id = -1
-        self._entity_states = {}
+        self._entity_info = {}
         self._handlers = {}
 
         self._connect()
@@ -80,16 +80,32 @@ class HomeAssistantBackend:
             }
         )
 
-    def get_entity_state(self, entity_id):
+    def get_entity_info(self, entity_id):
         """
-        Returns the state of the entity with the given ID or None if unknown.
+        Returns the info of the entity with the given ID or None if unknown.
+        Contains:
+          * entity_id
+          * state
+          * attributes
+          * last_changed
+          * last_reported
+          * last_updated
+          * context
         """
-        return self._entity_states.get(entity_id)
+        return self._entity_info.get(entity_id)
 
     def register_state_change_handler(self, entity_id, callback):
         """
         Registers a handler that is called when the state of the entity with
-        the given changes.
+        the given ID changes. The handler is called with the entity info dict
+        as a parameter, containing:
+          * entity_id
+          * state
+          * attributes
+          * last_changed
+          * last_reported
+          * last_updated
+          * context
         """
         if entity_id not in self._handlers:
             self._handlers[entity_id] = []
@@ -126,15 +142,14 @@ class HomeAssistantBackend:
             if data["id"] == self._get_states_id:
                 # Initial states received, store them:
                 for entity in data["result"]:
-                    self._entity_states[entity["entity_id"]] = entity["state"]
+                    self._entity_info[entity["entity_id"]] = entity
                     self._call_handlers(entity["entity_id"])
         elif msg_type == "event":
             if data["event"]["event_type"] == "state_changed":
                 # State change received, update entity states:
-                self._entity_states[data["event"]["data"]["entity_id"]] = data["event"][
-                    "data"
-                ]["new_state"]["state"]
-                self._call_handlers(data["event"]["data"]["entity_id"])
+                entity_id = data["event"]["data"]["entity_id"]
+                self._entity_info[entity_id] = data["event"]["data"]["new_state"]
+                self._call_handlers(entity_id)
         else:
             logger.warning("Unknown message: %s", message)
 
@@ -144,7 +159,7 @@ class HomeAssistantBackend:
         the given ID.
         """
         for handler in self._handlers.get(entity_id, []):
-            handler(entity_id, self._entity_states[entity_id])
+            handler(self._entity_info[entity_id])
 
     @staticmethod
     def _on_error(_, error):
