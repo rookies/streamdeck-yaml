@@ -1,73 +1,73 @@
 ---
 
 keys:
-  - kind: SubMenu
+  - kind: SubMenuKey
     values:
       icon: lightbulb-multiple
       title: Lights
       keys:
-        - kind: HomeAssistantToggle
+        - kind: HomeAssistantToggleKey
           backend: ha-tony
           values:
             title: Bookshelf
             entity_id: light.bedroom_bookshelf_lamp
-        - kind: HomeAssistantToggle
+        - kind: HomeAssistantToggleKey
           backend: ha-tony
           values:
             title: Deco
             entity_id: light.bedroom_decoration_lamps
-        - kind: HomeAssistantToggle
+        - kind: HomeAssistantToggleKey
           backend: ha-tony
           values:
             title: Wall
             entity_id: light.bedroom_window_wall_lamp
         - null
         - null
-        - kind: BackButton
-  - kind: SubMenu
+        - kind: BackKey
+  - kind: SubMenuKey
     values:
       title: Media
       icon: projector
       keys:
-        - kind: HomeAssistantToggle
+        - kind: HomeAssistantToggleKey
           backend: ha-tony
           values:
             title: Audio
             entity_id: switch.bedroom_audio
-        - kind: HomeAssistantToggle
+        - kind: HomeAssistantToggleKey
           backend: ha-tony
           values:
             title: Speakers
             entity_id: switch.bedroom_main_speakers
-        - kind: HomeAssistantToggle
+        - kind: HomeAssistantToggleKey
           backend: ha-tony
           values:
             title: Projector
             entity_id: switch.bedroom_projector
-        - kind: HomeAssistantToggle
+        - kind: HomeAssistantToggleKey
           backend: ha-tony
           values:
             title: herschel
             entity_id: switch.herschel
-        - kind: HomeAssistantScript
+        - kind: HomeAssistantScriptKey
           backend: ha-tony
           values:
             icon: theater
             title: Cinema
             entity_id: script.cinema_prepare
-        - kind: BackButton
-  - kind: SubMenu
+        - kind: BackKey
+  - kind: SubMenuKey
     values:
       title: AC
       icon: fan
       keys:
-        - kind: HomeAssistantToggle
+        - kind: HomeAssistantToggleKey
           backend: ha-tony
           values:
             icon: air-humidifier
             title: Dehumid
             entity_id: switch.dehumidifier_pwr
-        - kind: HomeAssistantToggle
+        - kind: HomeAssistantToggleKey
           backend: ha-tony
           values:
             icon: fan
@@ -76,7 +76,7 @@ keys:
         - null
         - null
         - null
-        - kind: BackButton
+        - kind: BackKey
 frontend:
   kind: ElgatoFrontend
   rows: 2
