@@ -145,7 +145,9 @@ class Main:
             return
 
         key = self._keys[key_index]
-        logger.info("Key #%d (%s) pressed, calling handler", key_index, type(key))
+        logger.info(
+            "Key #%d (%s) pressed, calling handler", key_index, type(key).__name__
+        )
         result, details = key.pressed()
         logger.debug(
             "Keypress handler for key #%d (%s) returned %s",

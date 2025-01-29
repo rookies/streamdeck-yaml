@@ -5,7 +5,7 @@ Class that renders the information about a key (icon, title, ...) as an image.
 import os.path
 import numpy
 from PIL import Image, ImageFont, ImageDraw, ImageColor
-from keys.generic import Key
+from keys import KeyBase
 
 ICON_PATH = os.path.join(os.path.dirname(__file__), "../../resources/icons")
 
@@ -20,7 +20,7 @@ class ImageRenderer:
         self._config = config
         self._size = size
 
-    def render(self, key: Key) -> Image:
+    def render(self, key: KeyBase) -> Image:
         """
         Renders an image for the given key and returns the Pillow image.
         """

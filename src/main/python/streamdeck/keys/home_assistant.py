@@ -3,12 +3,12 @@
 Keys for integration with HomeAssistant.
 """
 import logging
-from keys.generic import Key, KeyPressResult
+from keys.base import KeyBase, KeyPressResult
 
 logger = logging.getLogger("streamdeck.keys.home_assistant")
 
 
-class HomeAssistantToggle(Key):
+class HomeAssistantToggleKey(KeyBase):
     """
     A key that represents the state of a HomeAssistant entity that can be toggled.
     Currently, lights and switches are supported.
@@ -113,7 +113,7 @@ class HomeAssistantToggle(Key):
             self._icon_color = self._icon_color_by_state["unknown"]
 
 
-class HomeAssistantScript(Key):
+class HomeAssistantScriptKey(KeyBase):
     # pylint: disable=too-few-public-methods
     """
     A key that can trigger a HomeAssistant script.
@@ -128,7 +128,7 @@ class HomeAssistantScript(Key):
         return None, None
 
 
-class HomeAssistantClimatePreset(Key):
+class HomeAssistantClimatePresetKey(KeyBase):
     """
     A key that can switch the climate preset in HomeAssistant.
     """
