@@ -29,7 +29,7 @@ class HomeAssistantToggle(Key):
 
     _icon_color_by_domain_and_state = {
         "light": {
-            "on": "#fdd835",
+            "on": "#ffc107",
             "off": "black",
             "unknown": "black",
         },
@@ -144,10 +144,10 @@ class HomeAssistantClimatePreset(Key):
 
     _icon_color_by_state = {
         "none": "black",
-        "frost": "#fdd835",
-        "eco": "#fdd835",
-        "comfort": "#fdd835",
-        "boost": "#fdd835",
+        "frost": "#44739e",
+        "eco": "#43a047",
+        "comfort": "#ffc107",
+        "boost": "#db4437",
         "unknown": "black",
     }
 
