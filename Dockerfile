@@ -5,7 +5,8 @@ RUN apk add --no-cache python3 \
     py3-pip \
     py3-numpy \
     py3-pillow \
-    hidapi && \
+    hidapi \
+    font-opensans && \
   python -m venv --system-site-packages /venv && \
   PATH=/venv/bin:$PATH pip install -r /requirements.txt
 COPY src /app/src

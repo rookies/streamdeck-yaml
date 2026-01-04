@@ -83,7 +83,7 @@ frontend:
   columns: 3
   timeout: 300  # seconds, i.e. 5 minutes
 style:
-  font: /usr/share/fonts/TTF/OpenSans-Bold.ttf
+  font: /usr/share/fonts/opensans/OpenSans-Bold.ttf
   max_fontsize: 15
   padding: 7
 backends:

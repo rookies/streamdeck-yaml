@@ -4,6 +4,6 @@ services:
     build: .
     restart: always
     volumes:
-      - ${PWD}:/hostdir:ro
+      - ${PWD}/config.yml:/config.yml:ro
     privileged: true
-    command: /hostdir/config.yml
+    command: /config.yml
