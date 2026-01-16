@@ -1,0 +1,4 @@
+**/__pycache__/
+.gradle/
+.venv/
+.git/
