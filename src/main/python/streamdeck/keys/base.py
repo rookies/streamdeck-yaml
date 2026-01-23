@@ -2,6 +2,7 @@
 """
 Contains an abstract base class for key classes.
 """
+
 import enum
 from abc import ABC, abstractmethod
 from typing import Tuple

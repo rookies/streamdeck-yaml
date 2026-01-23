@@ -2,6 +2,7 @@
 """
 Class that renders the information about a key (icon, title, ...) as an image.
 """
+
 import os.path
 import numpy
 from PIL import Image, ImageFont, ImageDraw, ImageColor

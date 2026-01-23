@@ -2,6 +2,7 @@
 """
 HomeAssistant backend
 """
+
 import ssl
 import time
 import json

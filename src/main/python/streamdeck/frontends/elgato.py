@@ -3,6 +3,7 @@
 Frontend using the python-elgato-streamdeck library, see
 https://github.com/abcminiuser/python-elgato-streamdeck
 """
+
 import time
 import logging
 from PIL import Image
