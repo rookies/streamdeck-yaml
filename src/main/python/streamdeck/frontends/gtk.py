@@ -2,6 +2,7 @@
 """
 Gtk frontend, useful for development purposes
 """
+
 import logging
 from PIL import Image
 from frontends import Frontend

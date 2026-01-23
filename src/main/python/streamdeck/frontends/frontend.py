@@ -2,6 +2,7 @@
 """
 Abstract base class for all frontends.
 """
+
 import time
 import logging
 from abc import ABC, abstractmethod

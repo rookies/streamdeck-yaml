@@ -2,6 +2,7 @@
 """
 Keys for integration with HomeAssistant.
 """
+
 import logging
 from keys.base import KeyBase, KeyPressResult
 

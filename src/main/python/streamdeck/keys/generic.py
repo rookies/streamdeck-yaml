@@ -2,6 +2,7 @@
 """
 Contains some generic key classes.
 """
+
 from keys.base import KeyBase, KeyPressResult
 
 

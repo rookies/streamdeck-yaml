@@ -2,6 +2,7 @@
 """
 Main application entrypoint.
 """
+
 import sys
 import enum
 import logging
