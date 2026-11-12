@@ -1,4 +1,4 @@
-FROM alpine:3.24.2
+FROM alpine:3.24.4
 
 COPY requirements.txt /
 RUN apk add --no-cache python3 \
